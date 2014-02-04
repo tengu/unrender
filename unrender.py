@@ -20,6 +20,49 @@ def paths(paths, threashold, min_depth):
 
     return tree
 
+def html():
+    """Reduce html tree by collapsing nodes with similar children.
+    For example:
+    html
+     body
+      table
+       tr
+        th
+         "item"
+        th
+         "price"
+       tr
+        td
+         "foo"
+        td
+         "$1"
+       tr repeated many times
+      div
+       ..
+    would be reduced to
+    html
+     body
+      table
+       tr
+        th
+         "item"
+        th
+         "price"
+       tr
+        td
+         "*"
+        td
+         "*"
+      div
+       ..
+      because the tr nodes repeats with similar pattern below it. 
+    """
+    IMPLEMENT_ME
+    # parse html
+    # at each node, tabulate all of its branches. (need abstract representation of a branch)
+    # collapse fat nodes, capturing values.
+    # render the collapsed tree.
+
 def collapse(n, key=None, path=None, **opt):
 
     assert isinstance(n, dict)
@@ -89,7 +132,33 @@ if __name__=='__main__':
     import sys
     import baker
 
-    def _paths(threashold=10, min_depth=2):
+    def _paths(threashold=10, min_depth=0):
+        """Summarize a stream of paths into patterns that could have produce them.
+        Path stream is read from stdin.
+        --threashold: segments with more children are collapsed.
+        --min_depth:  start collapsing at this depth.
+
+        For example:
+        $ unrender.py path --threashold=3 <<END
+        /data/band/black-sabbath.json
+        /data/band/judas-priest.json
+        /data/band/deep-purple.json
+        /data/band/iron-maiden.json
+        /data/band/motörhead.json
+        /www/favicon.ico
+        /www/metal.css
+        /www/html/black-sabbath.html
+        /www/html/judas-priest.html
+        /www/html/deep-purple.html
+        /www/html/iron-maiden.html
+        /www/html/motörhead.html
+        END
+
+        /www/html/*
+        /data/band/*
+        /www/favicon.ico
+        /www/metal.css
+"""
 
         path_list=[line.strip('\n') for line in sys.stdin.readlines()]
         tree=paths(path_list, threashold=int(threashold), min_depth=int(min_depth))
